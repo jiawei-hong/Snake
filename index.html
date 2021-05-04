@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .container{
+            text-align: center;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+
+<div class="container">
+    <div id="score">
+        目前分數：0
+    </div>
+
+    <canvas width="400" height="400"></canvas>
+</div>
+
+<script>
+    class Snake {
+        constructor() {
+            this.cvs = document.querySelector('canvas');
+            this.ctx = this.cvs.getContext('2d');
+            this.w = 400;
+            this.h = 400;
+            this.size = {x: 400, y: 400}
+            this.redBallPos = {x: 50, y: 50}
+            this.snakeSize = {x: 20, y: 20}
+            this.scoreText = document.querySelector('#score');
+            this.score = 0;
+            // this.snakeCount = 1;
+            this.registerEvent();
+            this.start();
+            this.createRedArc();
+        }
+
+        start() {
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillRect(0, 0, this.w, this.h);
+            this.ctx.restore();
+            this.ctx.fillStyle = 'lime';
+            this.ctx.fillRect(this.size.x / 2, this.size.y / 2, this.snakeSize.x, this.snakeSize.y);
+            this.createRedArc();
+            this.isCollision();
+        }
+
+        createRedArc() {
+            this.ctx.beginPath();
+            this.ctx.arc(this.redBallPos.x, this.redBallPos.y, 10, 0, 2 * Math.PI);
+            this.ctx.fillStyle = 'red';
+            this.ctx.fill();
+            this.ctx.restore();
+            this.ctx.closePath()
+        }
+
+        isCollision() {
+            if ((this.size.x / 2) + 10 == this.redBallPos.x && (this.size.y / 2) + 10 == this.redBallPos.y) {
+                this.score += 1;
+                // this.snakeCount += 1;
+
+                let x = Math.floor(Math.random() * 400);
+                let y = Math.floor(Math.random() * 400);
+
+                if(x % 5 != 0)
+                    x += 5 - x % 5;
+
+                if(y % 5 != 0)
+                    y += 5 - y % 5;
+
+                this.redBallPos.x = x;
+                this.redBallPos.y = y;
+                this.scoreText.innerText = `目前分數：${this.score * 10}`;
+            }
+        }
+
+        registerEvent() {
+            window.addEventListener('keydown', (e) => {
+                if (e.keyCode == 38) {
+                    this.size.y -= 10;
+                } else if (e.keyCode == 37) {
+                    this.size.x -= 10;
+                } else if (e.keyCode == 39) {
+                    this.size.x += 10;
+                } else if (e.keyCode == 40) {
+                    this.size.y += 10;
+                }
+
+                this.start();
+            })
+        }
+    }
+
+    let snake = new Snake();
+</script>
+</body>
+</html>
