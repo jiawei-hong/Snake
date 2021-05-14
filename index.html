@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <style>
-        .container{
+        .container {
             text-align: center;
         }
     </style>
@@ -34,18 +34,45 @@
             this.snakeSize = {x: 20, y: 20}
             this.scoreText = document.querySelector('#score');
             this.score = 0;
-            // this.snakeCount = 1;
-            this.registerEvent();
-            this.start();
+            this.snakeCount = 0;
             this.createRedArc();
+            this.direction = {
+                x: 0,
+                y: -10
+            }
+            this.registerEvent();
         }
 
         start() {
+            let sizeX = this.size.x / 2;
+            let sizeY = this.size.y / 2;
+            let snakeSizeX = this.snakeSize.x;
+            let snakeSizeY = this.snakeSize.y;
+
+
+            if (this.direction.y == -10) {
+                snakeSizeY = this.snakeCount * 10 + snakeSizeY;
+            } else if (this.direction.y == 10) {
+                snakeSizeY = -(this.snakeCount * 10) - snakeSizeY;
+                sizeY += 20;
+            } else if (this.direction.x == -10){
+                snakeSizeX = this.snakeCount * 10 + snakeSizeX;
+            } else if (this.direction.x == 10){
+                snakeSizeX = -(this.snakeCount * 10) - snakeSizeX;
+                sizeX+= 20;
+            }
+
+            console.log(this.direction);
+
             this.ctx.fillStyle = 'black';
             this.ctx.fillRect(0, 0, this.w, this.h);
-            this.ctx.restore();
             this.ctx.fillStyle = 'lime';
-            this.ctx.fillRect(this.size.x / 2, this.size.y / 2, this.snakeSize.x, this.snakeSize.y);
+            this.ctx.fillRect(sizeX, sizeY, snakeSizeX, snakeSizeY);
+            this.ctx.beginPath();
+            this.ctx.fillStyle = 'red';
+            this.ctx.arc(this.size.x / 2 + 10, this.size.y / 2 + 10, 5, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.closePath();
             this.createRedArc();
             this.isCollision();
         }
@@ -55,22 +82,21 @@
             this.ctx.arc(this.redBallPos.x, this.redBallPos.y, 10, 0, 2 * Math.PI);
             this.ctx.fillStyle = 'red';
             this.ctx.fill();
-            this.ctx.restore();
             this.ctx.closePath()
         }
 
         isCollision() {
             if ((this.size.x / 2) + 10 == this.redBallPos.x && (this.size.y / 2) + 10 == this.redBallPos.y) {
                 this.score += 1;
-                // this.snakeCount += 1;
+                this.snakeCount += 1;
 
                 let x = Math.floor(Math.random() * 400);
                 let y = Math.floor(Math.random() * 400);
 
-                if(x % 5 != 0)
+                if (x % 5 != 0)
                     x += 5 - x % 5;
 
-                if(y % 5 != 0)
+                if (y % 5 != 0)
                     y += 5 - y % 5;
 
                 this.redBallPos.x = x;
@@ -82,17 +108,26 @@
         registerEvent() {
             window.addEventListener('keydown', (e) => {
                 if (e.keyCode == 38) {
-                    this.size.y -= 10;
+                    this.direction.y = -10;
+                    this.direction.x = 0;
                 } else if (e.keyCode == 37) {
-                    this.size.x -= 10;
+                    this.direction.y = 0;
+                    this.direction.x = -10;
                 } else if (e.keyCode == 39) {
-                    this.size.x += 10;
+                    this.direction.y = 0;
+                    this.direction.x = 10;
                 } else if (e.keyCode == 40) {
-                    this.size.y += 10;
+                    this.direction.x = 0;
+                    this.direction.y = 10;
                 }
+            })
+
+            setInterval(() => {
+                this.size.y += this.direction.y;
+                this.size.x += this.direction.x;
 
                 this.start();
-            })
+            }, 100);
         }
     }
 
